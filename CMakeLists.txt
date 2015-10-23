@@ -1,5 +1,5 @@
 project(ssl-vision)
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.6)
 
 #defines
 add_definitions(-D UNIX)
