@@ -1,12 +1,30 @@
 project(ssl-vision)
 cmake_minimum_required(VERSION 2.8.6)
 
-#defines
+# defines
 add_definitions(-D UNIX)
 add_definitions(-D LINUX)
 add_definitions(-D _GNU_SOURCE)
 
-SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
+
+set(arch ${CMAKE_SYSTEM_PROCESSOR})
+message(STATUS "Arch: ${arch}")
+
+if(${arch} MATCHES "x86_64")
+	# set compiler flags here for x86_64
+	set(CMAKE_CXX_FLAGS "")
+elseif(${arch} MATCHES "x86")
+	# set compiler flags here for x86
+	set(CMAKE_CXX_FLAGS "")
+endif()
+
+add_definitions(-Wall -Wextra)
+set(CMAKE_CXX_FLAGS_DEBUG   "-g -Wl,--no-as-needed")
+set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3 -march=native -Wl,--no-as-needed")
+set(CMAKE_EXE_LINKER_FLAGS  "-s")
+
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 # Find third-party libraries
 find_package(OpenGL REQUIRED)
@@ -25,23 +43,21 @@ pkg_check_modules(Eigen2 REQUIRED eigen2)
 pkg_check_modules(DC1394 REQUIRED libdc1394-2)
 
 include_directories(
-	${PROJECT_BINARY_DIR}
 	${Eigen2_INCLUDE_DIRS}
 	${PROTOBUF_INCLUDE_DIRS}
+	${PROJECT_BINARY_DIR}
+	${PROJECT_SOURCE_DIR}/src/app
+	${PROJECT_SOURCE_DIR}/src/app/gui
+	${PROJECT_SOURCE_DIR}/src/app/plugins
+	${PROJECT_SOURCE_DIR}/src/app/stacks
 )
 
 set(CMAKE_AUTOMOC ON)
-
-include ( ${QT_USE_FILE} )
+include(${QT_USE_FILE})
 
 include(src/shared/CMakeLists.txt.inc)
 
-include_directories(${PROJECT_SOURCE_DIR}/src/app)
-include_directories(${PROJECT_SOURCE_DIR}/src/app/gui)
-include_directories(${PROJECT_SOURCE_DIR}/src/app/plugins)
-include_directories(${PROJECT_SOURCE_DIR}/src/app/stacks)
-
-set (SRCS
+set(SRCS
 	src/app/capture_thread.cpp
 	src/app/framedata.cpp
 	src/app/main.cpp
@@ -78,7 +94,7 @@ set (SRCS
 	src/app/stacks/visionstack.cpp
 )
 
-qt4_wrap_ui (UI_SRCS
+qt4_wrap_ui(UI_SRCS
 	src/app/gui/mainwindow.ui
 	src/app/gui/videowidget.ui
 )
@@ -92,54 +108,31 @@ qt4_add_resources(SHARED_RC_SRCS
 	${SHARED_RC}
 )
 
-set (arch ${CMAKE_SYSTEM_PROCESSOR})
-
-message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
-message (STATUS "Arch: ${arch}")
-
-if (${arch} MATCHES "x86_64")
-	#set compiler flags here for x86_64
-	set (cc_flags "")
-elseif (${arch} MATCHES "x86")
-	#set compiler flags here for x86
-	set (cc_flags "")
-endif()
-
-#flags to set in debug mode
-set (CMAKE_CXX_FLAGS_DEBUG "-g -Wl,--no-as-needed")
-
-#flags to set in release mode
-set (CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3 -march=native -Wl,--no-as-needed")
-
-message( STATUS "CC Flags: ${CMAKE_CXX_FLAGS_RELEASE}")
-message (STATUS "Custom CC Flags: ${cc_flags}")
-
-add_definitions(${cc_flags})
-
 ## build the common code
 add_library(sslvision ${SHARED_RC_SRCS} ${CC_PROTO} ${SHARED_SRCS})
 
-set (libs ${QT_LIBRARIES}
+set(libs
 	${CMAKE_THREAD_LIBS_INIT}
+	${DC1394_LIBRARIES}
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
 	${PROTOBUF_LIBRARIES}
-	${DC1394_LIBRARIES}
+	${QT_LIBRARIES}
 	sslvision
 )
 
 ## build the main app
-set (target vision)
+set(target vision)
 add_executable(${target} ${UI_SRCS} ${RC_SRCS} ${SRCS})
 target_link_libraries(${target} ${libs})
 
 ##build non graphical client
-set (client client)
+set(client client)
 add_executable(${client} src/client/main.cpp )
 target_link_libraries(${client} ${libs})
 
-##build logging client
-set (lclient logClient)
+## build logging client
+set(lclient logClient)
 add_executable(${lclient}
 	src/logClient/main.cpp 
 	src/logClient/CentralWindow.cpp
@@ -149,13 +142,12 @@ add_executable(${lclient}
 )
 target_link_libraries(${lclient} ${libs})
 
-##build graphical client
-set (gclient graphicalClient)
+## build graphical client
+set(gclient graphicalClient)
 add_executable(${gclient}
-  src/graphicalClient/main.cpp
-  src/graphicalClient/soccerview.cpp
-  src/graphicalClient/gltext.cpp
+	src/graphicalClient/main.cpp
+	src/graphicalClient/soccerview.cpp
+	src/graphicalClient/gltext.cpp
 )
 target_link_libraries(${gclient} ${libs})
-
 
