@@ -8,12 +8,27 @@ add_definitions(-D _GNU_SOURCE)
 
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
-set (QT_USE_QTNETWORK true)
-set (QT_USE_QTOPENGL true)
+# Find third-party libraries
+find_package(OpenGL REQUIRED)
+find_package(Qt4 4.8.0 COMPONENTS QtCore QtGui QtOpenGL QtNetwork REQUIRED)
+find_package(Threads REQUIRED)
 
-find_package ( Qt4 REQUIRED )
+find_package(Protobuf REQUIRED)
+if(EXISTS ${PROTOBUF_PROTOC_EXECUTABLE})
+	message(STATUS "Found PROTOBUF Compiler: ${PROTOBUF_PROTOC_EXECUTABLE}")
+else()
+	message(FATAL_ERROR "Could not find PROTOBUF Compiler")
+endif()
 
-include_directories(${PROJECT_BINARY_DIR})
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(Eigen2 REQUIRED eigen2)
+pkg_check_modules(DC1394 REQUIRED libdc1394-2)
+
+include_directories(
+	${PROJECT_BINARY_DIR}
+	${Eigen2_INCLUDE_DIRS}
+	${PROTOBUF_INCLUDE_DIRS}
+)
 
 include ( ${QT_USE_FILE} )
 
@@ -142,7 +157,14 @@ add_definitions(${cc_flags})
 add_library(sslvision ${SHARED_MOC_SRCS} ${SHARED_RC_SRCS} ${CC_PROTO} ${SHARED_SRCS})
 add_dependencies(sslvision GenerateProto)
 
-set (libs ${QT_LIBRARIES} dc1394 jpeg png protobuf pthread GL GLU sslvision)
+set (libs ${QT_LIBRARIES}
+	${CMAKE_THREAD_LIBS_INIT}
+	${OPENGL_gl_LIBRARY}
+	${OPENGL_glu_LIBRARY}
+	${PROTOBUF_LIBRARIES}
+	${DC1394_LIBRARIES}
+	sslvision
+)
 
 ## build the main app
 set (target vision)

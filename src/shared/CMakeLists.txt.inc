@@ -12,8 +12,6 @@ include_directories(${shared_dir}/vartypes/enhanced)
 include_directories(${shared_dir}/vartypes/gui)
 include_directories(${shared_dir}/vartypes/xml)
 
-include_directories("/usr/include/eigen2")
-
 set (SHARED_SRCS
 	${shared_dir}/capture/capturedc1394v2.cpp
 	${shared_dir}/capture/capturefromfile.cpp
