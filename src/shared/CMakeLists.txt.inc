@@ -135,37 +135,6 @@ set (SHARED_RC
 )
 
 ### protocol buffer generation code
-
 set (PROTO_PATH ${shared_dir}/proto)
-
-set (PROTO_FILES
-	messages_robocup_ssl_detection
-	messages_robocup_ssl_geometry
-	messages_robocup_ssl_wrapper
-	messages_robocup_ssl_refbox_log
-  messages_robocup_ssl_geometry_legacy
-  messages_robocup_ssl_wrapper_legacy
-)
-
-set (CC_PROTO)
-set (H_PROTO)
-
-foreach (file ${PROTO_FILES})
-	set (cc_file ${file}.pb.cc)
-	set (h_file ${file}.pb.h)
-	set (proto_file ${file}.proto)
-
-	add_custom_command(OUTPUT ${cc_file} ${h_file}
-			COMMAND protoc --cpp_out=${PROJECT_BINARY_DIR} --proto_path=${PROTO_PATH} ${PROTO_PATH}/${proto_file}
-			DEPENDS ${PROTO_PATH}/${proto_file}
-			VERBATIM
-	)
-
-	list (APPEND CC_PROTO ${PROJECT_BINARY_DIR}/${cc_file})
-	list (APPEND H_PROTO ${PROJECT_BINARY_DIR}/${h_file})
-endforeach()
-
-add_custom_target(GenerateProto
-	    DEPENDS ${CC_PROTO} ${H_PROTO}
-	    VERBATIM
-	)
+file(GLOB_RECURSE PROTO_FILES ${PROTO_PATH}/*.proto)
+protobuf_generate_cpp(CC_PROTO H_PROTO ${PROTO_FILES})

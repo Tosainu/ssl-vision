@@ -155,7 +155,6 @@ add_definitions(${cc_flags})
 
 ## build the common code
 add_library(sslvision ${SHARED_MOC_SRCS} ${SHARED_RC_SRCS} ${CC_PROTO} ${SHARED_SRCS})
-add_dependencies(sslvision GenerateProto)
 
 set (libs ${QT_LIBRARIES}
 	${CMAKE_THREAD_LIBS_INIT}
