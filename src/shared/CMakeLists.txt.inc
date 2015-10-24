@@ -97,39 +97,6 @@ set (SHARED_SRCS
   ${shared_dir}/util/field_default_constants.cpp
 )
 
-#only ones that need to be moc'ed
-set (SHARED_HEADERS
-	${shared_dir}/capture/capturedc1394v2.h
-	${shared_dir}/capture/capturefromfile.h
-  ${shared_dir}/capture/capture_generator.h
-
-	${shared_dir}/cmpattern/cmpattern_team.h
-	${shared_dir}/cmpattern/cmpattern_teamdetector.h
-
-	${shared_dir}/util/field.h
-
-	${shared_dir}/vartypes/VarNotifier.h
-
-  ${shared_dir}/vartypes/primitives/VarType.h
-	${shared_dir}/vartypes/primitives/VarBlob.h
-	${shared_dir}/vartypes/primitives/VarBool.h
-	${shared_dir}/vartypes/primitives/VarDouble.h
-	${shared_dir}/vartypes/primitives/VarExternal.h
-	${shared_dir}/vartypes/primitives/VarInt.h
-	${shared_dir}/vartypes/primitives/VarList.h
-	${shared_dir}/vartypes/primitives/VarQWidget.h
-	${shared_dir}/vartypes/primitives/VarSelection.h
-	${shared_dir}/vartypes/primitives/VarString.h
-	${shared_dir}/vartypes/primitives/VarStringEnum.h
-	${shared_dir}/vartypes/primitives/VarTrigger.h
-  #${shared_dir}/vartypes/primitives/VarProtoBuffer.h
-
-	${shared_dir}/vartypes/gui/VarItem.h
-	${shared_dir}/vartypes/gui/VarItemDelegate.h
-	${shared_dir}/vartypes/gui/VarTreeModel.h
-	${shared_dir}/vartypes/gui/VarTreeView.h
-)
-
 set (SHARED_RC
 	${shared_dir}/vartypes/gui/icons/icons.qrc
 )

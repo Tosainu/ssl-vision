@@ -30,6 +30,8 @@ include_directories(
 	${PROTOBUF_INCLUDE_DIRS}
 )
 
+set(CMAKE_AUTOMOC ON)
+
 include ( ${QT_USE_FILE} )
 
 include(src/shared/CMakeLists.txt.inc)
@@ -76,26 +78,6 @@ set (SRCS
 	src/app/stacks/visionstack.cpp
 )
 
-qt4_wrap_cpp (MOC_SRCS
-	src/app/capture_thread.h
-
-	src/app/gui/cameracalibwidget.h
-	src/app/gui/glLUTwidget.h
-	src/app/gui/glwidget.h
-	src/app/gui/lutwidget.h
-	src/app/gui/mainwindow.h
-	src/app/gui/videowidget.h
-	src/app/gui/jog_dial.h
-	src/shared/util/lut3d.h
-	
-	src/app/plugins/plugin_dvr.h
-	src/app/plugins/plugin_publishgeometry.h
-	src/app/plugins/plugin_legacypublishgeometry.h
-	src/app/plugins/visionplugin.h
-	
-	src/app/stacks/multistack_robocup_ssl.h
-)
-
 qt4_wrap_ui (UI_SRCS
 	src/app/gui/mainwindow.ui
 	src/app/gui/videowidget.ui
@@ -104,25 +86,6 @@ qt4_wrap_ui (UI_SRCS
 qt4_add_resources(RC_SRCS 
 	src/app/gui/icons/icons_gui.qrc
 	${SHARED_RC}
-)
-
-## generate moc files for graphicalClient
-qt4_wrap_cpp(LCLIENT_MOC_SRCS
-    src/logClient/CentralWindow.h
-    src/logClient/ClientThreading.h
-    src/logClient/GraphicsPrimitives.h
-    src/logClient/LogControl.h
-)
-
-## generate moc files for graphicalClient2
-qt4_wrap_cpp(GCLIENT_MOC_SRCS
-    src/graphicalClient/soccerview.h
-)
-
-## shared qt wrappings
-
-qt4_wrap_cpp (SHARED_MOC_SRCS
-	${SHARED_HEADERS}
 )
 
 qt4_add_resources(SHARED_RC_SRCS 
@@ -154,7 +117,7 @@ message (STATUS "Custom CC Flags: ${cc_flags}")
 add_definitions(${cc_flags})
 
 ## build the common code
-add_library(sslvision ${SHARED_MOC_SRCS} ${SHARED_RC_SRCS} ${CC_PROTO} ${SHARED_SRCS})
+add_library(sslvision ${SHARED_RC_SRCS} ${CC_PROTO} ${SHARED_SRCS})
 
 set (libs ${QT_LIBRARIES}
 	${CMAKE_THREAD_LIBS_INIT}
@@ -167,7 +130,7 @@ set (libs ${QT_LIBRARIES}
 
 ## build the main app
 set (target vision)
-add_executable(${target} ${UI_SRCS} ${MOC_SRCS} ${RC_SRCS} ${SRCS})
+add_executable(${target} ${UI_SRCS} ${RC_SRCS} ${SRCS})
 target_link_libraries(${target} ${libs})
 
 ##build non graphical client
@@ -177,7 +140,7 @@ target_link_libraries(${client} ${libs})
 
 ##build logging client
 set (lclient logClient)
-add_executable(${lclient} ${LCLIENT_MOC_SRCS}
+add_executable(${lclient}
 	src/logClient/main.cpp 
 	src/logClient/CentralWindow.cpp
 	src/logClient/ClientThreading.cpp
@@ -188,7 +151,7 @@ target_link_libraries(${lclient} ${libs})
 
 ##build graphical client
 set (gclient graphicalClient)
-add_executable(${gclient} ${GCLIENT_MOC_SRCS}
+add_executable(${gclient}
   src/graphicalClient/main.cpp
   src/graphicalClient/soccerview.cpp
   src/graphicalClient/gltext.cpp
